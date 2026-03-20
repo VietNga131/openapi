@@ -1,3 +1,2 @@
 Flask
-flask-cors
-flask_swagger_ui
+flasgger
