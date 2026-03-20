@@ -35,11 +35,6 @@ def api_response(success, data=None, message="", status_code=200):
 
 # --- API ENDPOINTS ---
 
-# Endpoint để phục vụ file swagger.yaml từ thư mục hiện tại ('.')
-@app.route('/swagger.yaml')
-def serve_swagger():
-    return send_from_directory('.', 'swagger.yaml')
-
 # 1. GET /books
 @app.route('/books', methods=['GET'])
 def get_books():
