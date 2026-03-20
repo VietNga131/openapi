@@ -94,6 +94,3 @@ def delete_book(book_id):
     
     books = [b for b in books if b["id"] != book_id]
     return api_response(True, data={"id": book_id}, message="Xoa sach thanh cong", status_code=200)
-
-if __name__ == '__main__':
-    app.run(debug=True)
