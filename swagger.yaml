@@ -1,27 +1,43 @@
 openapi: 3.0.0
 info:
-  title: Book Management API
-  description: API đơn giản để quản lý thư viện sách bằng Flask
-  version: 1.0.0
+  title: Library Management API
+  description: API đơn giản để quản lý đầu sách trong thư viện.
+  version: 4.0.0
 
+servers:
+  - url: /v1
+    description: Version 1.0
+  - url: /v2
+    description: Version 2.0
+  - url: /v3
+    description: Version 3.0
+  - url: /v4
+    description: Version 4.0
+
+tags:
+  - name: Books
+    description: Books Management
 
 paths:
   /books:
     get:
-      summary: Lấy danh sách toàn bộ sách
       tags:
         - Books
+      summary: Get all books
+      description: Return a list of books
+      operationId: getBooks
       responses:
         '200':
-          description: Trả về danh sách sách thành công
+          description: Success!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse_ListBooks'
+                $ref: '#/components/schemas/ArrayResponse'
     post:
-      summary: Thêm một cuốn sách mới
       tags:
         - Books
+      summary: Push a book
+      operationId: addBook
       requestBody:
         required: true
         content:
@@ -30,47 +46,47 @@ paths:
               $ref: '#/components/schemas/BookInput'
       responses:
         '201':
-          description: Đã tạo sách thành công
+          description: Created!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse_SingleBook'
+                $ref: '#/components/schemas/ObjectResponse'
         '400':
-          description: Bad Resquest
+          description: Missing data!
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
+  
   /books/{id}:
     parameters:
-      - in: path
-        name: id
+      - name: id
+        in: path
+        required: true
         schema:
           type: integer
-        required: true
-        description: ID của cuốn sách
     get:
-      summary: Lấy thông tin chi tiết một cuốn sách
       tags:
         - Books
+      summary: Get detail a book
+      operationId: getBook
       responses:
         '200':
-          description: Trả về thông tin sách thành công
+          description: Success!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse_SingleBook'
+                $ref: '#/components/schemas/ObjectResponse'
         '404':
-          description: Không tìm thấy sách
-          content: 
+          description: Not Found!
+          content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     put:
-      summary: Cập nhật thông tin sách
       tags:
         - Books
+      summary: Update a book
       requestBody:
         required: true
         content:
@@ -79,30 +95,30 @@ paths:
               $ref: '#/components/schemas/BookInput'
       responses:
         '200':
-          description: Cập nhật thành công
+          description: Success!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse_SingleBook'
+                $ref: '#/components/schemas/ObjectResponse'
         '404':
-          description: Không tìm thấy sách
+          description: Not Found!
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
-      summary: Xóa một cuốn sách
       tags:
         - Books
+      summary: Delete a book
       responses:
         '200':
-          description: Xóa sách thành công
+          description: Success!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse_DeletedBook'
+                $ref: '#/components/schemas/SuccessNoDataResponse'
         '404':
-          description: Không tìm thấy sách
+          description: Not Found!
           content:
             application/json:
               schema:
@@ -113,118 +129,42 @@ components:
     Book:
       type: object
       properties:
-        id:
-          type: integer
-          example: 1
-        title:
-          type: string
-          example: "Đắc Nhân Tâm"
-        author:
-          type: string
-          example: "Dale Carnegie"
-          
-    BookInput:
-      type: object
-      required:
-        - title
-        - author
-      properties:
-        title:
-          type: string
-          example: "Nhà Giả Kim"
-        author:
-          type: string
-          example: "Paulo Coelho"
+        id: { type: integer }
+        title: { type: string }
+        author: { type: string }
+        isbn: { type: string }
 
-    # --- CÁC FORMAT PHẢN HỒI CHUẨN HÓA ---
-    SuccessResponse_ListBooks:
+    ArrayResponse:
       type: object
       properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "Lấy danh sách thành công"
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Book'
-            
-    SuccessResponse_SingleBook:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "Thao tác thành công"
-        data:
-          $ref: '#/components/schemas/Book'
-
-    SuccessResponse_DeletedBook:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "Xóa sách thành công"
+        success: { type: boolean }
+        message: { type: string }
         data:
           type: object
           properties:
-            id:
-              type: integer
-              example: 1
-
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Book'
+      
+    ObjectResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        message: { type: string }
+        data:
+          $ref: '#/components/schemas/Book'
+        
     ErrorResponse:
       type: object
       properties:
-        success:
-          type: boolean
-          example: false
-        message:
-          type: string
-          example: "Lỗi hoặc không tìm thấy"
-        error:
-          nullable: true
-          example: null
-
-# components:
-#   schemas:
-#     Book:
-#       type: object
-#       properties:
-#         id: { type: integer, example: 1 }
-#         title: { type: string, example: "Đắc Nhân Tâm" }
-        
-#   parameters:
-#     PageLimit:
-#       name: limit
-#       in: query
-#       schema: { type: integer, default: 10 }
-
-#   responses:
-#     NotFound:
-#       description: Không tìm thấy tài nguyên
-#       content:
-#         application/json:
-#           schema:
-#             $ref: '#/components/schemas/ErrorResponse'
-
-#   requestBodies:
-#     BookPayload:
-#       description: Dữ liệu đầu vào để tạo hoặc sửa sách
-#       required: true
-#       content:
-#         application/json:
-#           schema:
-#             $ref: '#/components/schemas/BookInput'
-
-#   securitySchemes:
-#     BearerAuth:
-#       type: http
-#       scheme: bearer
-#       bearerFormat: JWT
+        success: { type: boolean  }
+        message: { type: string }
+        data: { nullable: true }
+    
+    SuccessNoDataResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        message: { type: string }
+        data: { nullable: true }
