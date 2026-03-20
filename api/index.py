@@ -1,23 +1,21 @@
-from flask import Flask, jsonify, request
-from flask_swagger_ui import get_swaggerui_blueprint
-from flask import send_from_directory
-from flask_cors import CORS
+import os
+from flask import Flask, jsonify, request, redirect
+from flasgger import Swagger
 
 app = Flask(__name__)
-CORS(app)
 
-# --- CẤU HÌNH SWAGGER UI ---
-SWAGGER_URL = '/api/docs'  # Đường dẫn để truy cập Swagger UI
-API_URL = '/swagger.yaml'  # Đường dẫn tới file OpenAPI của bạn
+app.config['SWAGGER'] = {
+    'openapi': '3.0.0'
+}
 
-swaggerui_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL,
-    API_URL,
-    config={
-        'app_name': "Book Management API"
-    }
-)
-app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+yaml_path = os.path.join(current_dir, '..', 'swagger.yaml')
+swagger = Swagger(app, template_file=yaml_path)
+
+@app.route('/')
+def home():
+    # Đưa người dùng sang trang tài liệu API
+    return redirect('/apidocs/')
 
 # --- MOCK DATA ---
 books = [
@@ -94,6 +92,4 @@ def delete_book(book_id):
     
     books = [b for b in books if b["id"] != book_id]
     return api_response(True, data={"id": book_id}, message="Xoa sach thanh cong", status_code=200)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+ 
