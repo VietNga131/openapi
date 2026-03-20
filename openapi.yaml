@@ -4,7 +4,7 @@ info:
   description: API đơn giản để quản lý thư viện sách bằng Flask
   version: 1.0.0
 servers:
-  - url: http://localhost:5000
+  - url: https://misty-prebromidic-nonoffensively.ngrok-free.dev
     description: Local server
 
 paths:
